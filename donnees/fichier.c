@@ -1,7 +1,7 @@
 /*
-Copyright août 2019, Stephan Runigo
+Copyright octobre 2020, Stephan Runigo
 runigo@free.fr
-SiCF 2.1  simulateur de corde vibrante et spectre
+SiCF 2.2  simulateur de corde vibrante et spectre
 Ce logiciel est un programme informatique servant à simuler l'équation
 d'une corde vibrante, à calculer sa transformée de fourier, et à donner
 une représentation graphique de ces fonctions.
@@ -32,121 +32,308 @@ termes.
 
 #include "fichier.h"
 
+int fichierEcritureParametre(systemeT * systeme, char * nom);
+int fichierLectureParametre(systemeT * systeme, char * nom);
+
+
+int fichierInitialiseSysteme(systemeT * systeme, fourierT * fourier, graphesT * graphes);
+
+int fichierEcriturePosition(systemeT * systeme, char * nom);
+int fichierLecturePosition(systemeT * systeme, char * nom);
+
 int fichierFonctionNulle(systemeT * systeme);
 int fichierFonctionTriangle(systemeT * systeme, int numero);
 int fichierFonctionCarre(systemeT * systeme, int numero);
 int fichierFonctionSinus(systemeT * systeme, int numero);
 
 
-
-void fichierEcriture(systemeT * systeme, int numero)
+int fichierEcriture(systemeT * systeme, char * nom)
 	{
-	FILE *fichier; /* pointeur sur FILE */
-	double ancien, actuel;
-	int i;
+	fprintf(stderr, "Ecriture des paramètres %s\n", nom);
+	fichierEcritureParametre(systeme, nom);
+	fprintf(stderr, "Ecriture des positions %s\n", nom);
+	fichierEcriturePosition(systeme, nom);
 
-	switch (numero)
-		{
-		case 0 :
-			fichier = fopen("./donnees/enregistrement/position_q.sicf", "w");break;
-		case 1 :
-			fichier = fopen("./donnees/enregistrement/position_s.sicf", "w");break;
-		case 2 :
-			fichier = fopen("./donnees/enregistrement/position_d.sicf", "w");break;
-		case 3 :
-			fichier = fopen("./donnees/enregistrement/position_f.sicf", "w");break;
-		case 4 :
-			fichier = fopen("./donnees/enregistrement/position_g.sicf", "w");break;
-		case 5 :
-			fichier = fopen("./donnees/enregistrement/position_h.sicf", "w");break;
-		case 6 :
-			fichier = fopen("./donnees/enregistrement/position_j.sicf", "w");break;
-		case 7 :
-			fichier = fopen("./donnees/enregistrement/position_k.sicf", "w");break;
-		case 8 :
-			fichier = fopen("./donnees/enregistrement/position_l.sicf", "w");break;
-		case 9 :
-			fichier = fopen("./donnees/enregistrement/position_m.sicf", "w");break;
-		case 10 :
-			fichier = fopen("./donnees/enregistrement/position_w.sicf", "w");break;
-		case 11 :
-			fichier = fopen("./donnees/enregistrement/position_x.sicf", "w");break;
-		case 12 :
-			fichier = fopen("./donnees/enregistrement/position_c.sicf", "w");break;
-		case 13 :
-			fichier = fopen("./donnees/enregistrement/position_v.sicf", "w");break;
-		case 14 :
-			fichier = fopen("./donnees/enregistrement/position_b.sicf", "w");break;
-		case 15 :
-			fichier = fopen("./donnees/enregistrement/position_n.sicf", "w");break;
-		default:
-			;
-		}
-	//fichier = fopen("fluxon.sicp", "w");  /* write */
-
-	for(i=0;i<(*systeme).nombre;i++)
-		{
-		//penduleInitialisePosition(&(*systeme).pendule[i], 0.0, 0.0);
-		ancien = (*systeme).pendule[i].ancien;
-		actuel =(*systeme).pendule[i].nouveau;
-		fprintf(fichier, "%f %f\n", ancien, actuel);
-		}
-	fclose(fichier);
-
-	return;
+	return 0;
 	}
 
-void fichierLecture(systemeT * systeme, int numero)
+int fichierLecture(systemeT * systeme, fourierT * fourier, graphesT * graphes, char * nom)
+	{
+			fprintf(stderr, "Réinitialisation du système\n");
+
+		fprintf(stderr, "Initialisation des paramètres %s\n", nom);
+	fichierLectureParametre(systeme, nom);
+
+		fprintf(stderr, "Initialisation du système \n");
+	fichierInitialiseSysteme(systeme, fourier, graphes);
+
+		fprintf(stderr, "Initialisation des positions %s\n", nom);
+	fichierLecturePosition(systeme, nom);
+
+	return 0;
+	}
+
+int fichierInitialiseSysteme(systemeT * systeme, fourierT * fourier, graphesT * graphes)
+	{
+            	// Réinitialisation du système
+
+	systemeInitialise(systeme);
+
+	changeFormeDissipation(systeme, (*systeme).modeDissipation);
+
+	changeConditionsLimites(systeme, (*systeme).libreFixe);
+
+	graphesInitialiseNombre(graphes, (*systeme).nombre);
+
+	fourierInitialise(fourier, (*systeme).nombre);
+
+	return 0;
+	}
+
+
+int fichierEcritureParametre(systemeT * systeme, char * nom)
 	{
 	FILE *fichier; /* pointeur sur FILE */
-	float ancien, actuel;
-	int i;
+	float reel;
+	int entier;
 
-	switch (numero)
-		{
-		case 10 : // Touche Q
-			fichier = fopen("./donnees/enregistrement/position_q.sicf", "r");break;
-		case 11 : // Touche S
-			fichier = fopen("./donnees/enregistrement/position_s.sicf", "r");break;
-		case 12 : // Touche D
-			fichier = fopen("./donnees/enregistrement/position_d.sicf", "r");break;
-		case 13 : // Touche F
-			fichier = fopen("./donnees/enregistrement/position_f.sicf", "r");break;
-		case 14 : // Touche G
-			fichier = fopen("./donnees/enregistrement/position_g.sicf", "r");break;
-		case 15 : // Touche H
-			fichier = fopen("./donnees/enregistrement/position_h.sicf", "r");break;
-		case 16 : // Touche J
-			fichier = fopen("./donnees/enregistrement/position_j.sicf", "r");break;
-		case 17 : // Touche K
-			fichier = fopen("./donnees/enregistrement/position_k.sicf", "r");break;
-		case 18 : // Touche L
-			fichier = fopen("./donnees/enregistrement/position_l.sicf", "r");break;
-		case 19 : // Touche M
-			fichier = fopen("./donnees/enregistrement/position_m.sicf", "r");break;
-		case 20 : // Touche W
-			fichier = fopen("./donnees/enregistrement/position_w.sicf", "r");break;
-		case 21 : // Touche X
-			fichier = fopen("./donnees/enregistrement/position_x.sicf", "r");break;
-		case 22 : // Touche C
-			fichier = fopen("./donnees/enregistrement/position_c.sicf", "r");break;
-		case 23 : // Touche V
-			fichier = fopen("./donnees/enregistrement/position_v.sicf", "r");break;
-		case 24 : // Touche B
-			fichier = fopen("./donnees/enregistrement/position_b.sicf", "r");break;
-		case 25 : // Touche N
-			fichier = fopen("./donnees/enregistrement/position_n.sicf", "r");break;
-		default:
-			;
-		}
-	//fichier = fopen("fluxon.sicp", "r");  /* read */
+	char chemin[120] = "./donnees/enregistrement/parametre_";
+
+	char * extension = ".sicf";
+
+	strncat(chemin, nom, 20);
+
+	strncat(chemin, extension, 40);
+
+	fichier = fopen(chemin, "w");
+
 	if(fichier == NULL)
 		{
-		printf("Erreur d'ouverture du fichier de réinitialisation\n");
+		printf("Erreur d'ouverture du fichier d'enregistrement\n");
 		printf("	Vérifier le répertoire donnees/enregistrement\n");
 		}
 	else
 		{
+		// Moteurs
+			// Paramètres d'horloge
+		reel = (*systeme).moteurs.dt;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).moteurs.chrono;
+			fprintf(fichier, "%f\n", reel);
+
+			// Moteur périodique sur le premier pendule
+		entier = (*systeme).moteurs.generateur;
+			fprintf(fichier, "%d\n", entier);
+		reel = (*systeme).moteurs.amplitude;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).moteurs.frequence;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).moteurs.phi;
+			fprintf(fichier, "%f\n", reel);
+
+			// Moteur courant Josephson
+		entier = (*systeme).moteurs.etatJosephson;
+			fprintf(fichier, "%d\n", entier);
+		reel = (*systeme).moteurs.courantJosephson;
+			fprintf(fichier, "%f\n", reel);
+
+			// Moteur créateur de Fluxon
+		entier = (*systeme).moteurs.fluxon;
+			fprintf(fichier, "%d\n", entier);
+		reel = (*systeme).moteurs.deltaDephasage;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).moteurs.dephasage;
+			fprintf(fichier, "%f\n", reel);
+
+		// Caractéristique de la chaîne
+		entier = (*systeme).nombre;
+			fprintf(fichier, "%d\n", entier);
+		entier = (*systeme).equation;
+			fprintf(fichier, "%d\n", entier);
+		reel = (*systeme).dephasage;
+			fprintf(fichier, "%f\n", reel);
+		entier = (*systeme).libreFixe;
+			fprintf(fichier, "%d\n", entier);
+
+		// Paramètres physiques
+		reel = (*systeme).masseDroite;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).masseGauche;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).longueur;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).couplage;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).gravitation;
+			fprintf(fichier, "%f\n", reel);
+
+		entier = (*systeme).modeDissipation;
+			fprintf(fichier, "%d\n", entier);
+		reel = (*systeme).dissipation;
+			fprintf(fichier, "%f\n", reel);
+		reel = (*systeme).pendule[0].dephasage;
+			fprintf(fichier, "%f\n", reel);
+
+		fclose(fichier);
+		}
+
+	return 0;
+	}
+
+int fichierLectureParametre(systemeT * systeme, char * nom)
+	{
+	FILE *fichier; /* pointeur sur FILE */
+	float reel = 0;
+	int entier = 0;
+	//(void)graphe;
+
+	char chemin[120] = "./donnees/enregistrement/parametre_";
+
+	char * extension = ".sicf";
+
+	strncat(chemin, nom, 20);
+
+	strncat(chemin, extension, 40);
+
+	fichier = fopen(chemin, "r");
+
+	if(fichier == NULL)
+		{
+		printf("Erreur d'ouverture du fichier d'enregistrement\n");
+		printf("	le fichier donnees/enregistrement/parametre_%s.sicf est absent\n", nom);
+		}
+	else
+		{
+		// Initialisation du moteurs
+			// Paramètres d'horloge
+		fscanf(fichier, "%f\n", &reel);
+		moteursInitialiseDt(&(*systeme).moteurs, reel);
+		fscanf(fichier, "%f\n", &reel);
+		moteursInitialiseChrono(&(*systeme).moteurs, reel);
+
+			// Moteur périodique sur le premier pendule
+		fscanf(fichier, "%d\n", &entier);
+		moteursInitialiseGenerateur(&(*systeme).moteurs, entier);
+		fscanf(fichier, "%f\n", &reel);
+		moteursInitialiseAmplitude(&(*systeme).moteurs, reel);
+		fscanf(fichier, "%f\n", &reel);
+		moteursInitialiseFrequence(&(*systeme).moteurs, reel);
+		fscanf(fichier, "%f\n", &reel);
+		moteursInitialisePhi(&(*systeme).moteurs, reel);
+
+			// Moteur courant Josephson
+		fscanf(fichier, "%d\n", &entier);
+		moteursInitialiseEtatJosephson(&(*systeme).moteurs, entier);
+		fscanf(fichier, "%f\n", &reel);
+		moteursInitialiseCourantJosephson(&(*systeme).moteurs, reel);
+
+			// Moteur créateur de Fluxon
+		fscanf(fichier, "%d\n", &entier);
+		moteursInitialiseFluxon(&(*systeme).moteurs, entier);
+		fscanf(fichier, "%f\n", &reel);
+		moteursInitialiseDeltaDephasage(&(*systeme).moteurs, reel);
+		fscanf(fichier, "%f\n", &reel);
+		moteursInitialiseDephasage(&(*systeme).moteurs, reel);
+
+
+		// Initialisation de la chaîne
+			// Caractéristiques
+		fscanf(fichier, "%d\n", &entier);
+		systemeInitialiseNombre(systeme, entier);
+		fscanf(fichier, "%d\n", &entier);
+		systemeInitialiseEquation(systeme, entier);
+
+		fscanf(fichier, "%f\n", &reel);
+		systemeInitialiseDephasage(systeme, reel);
+		fscanf(fichier, "%d\n", &entier);
+		systemeInitialiseLibreFixe(systeme, entier);
+
+			// Paramètres physiques
+		fscanf(fichier, "%f\n", &reel);
+		systemeInitialiseMasseDroite(systeme, reel);
+		fscanf(fichier, "%f\n", &reel);
+		systemeInitialiseMasseGauche(systeme, reel);
+		fscanf(fichier, "%f\n", &reel);
+		systemeInitialiseLongueur(systeme, reel);
+		fscanf(fichier, "%f\n", &reel);
+		systemeInitialiseCouplage(systeme, reel);
+		fscanf(fichier, "%f\n", &reel);
+		systemeInitialiseGravitation(systeme, reel);
+		fscanf(fichier, "%d\n", &entier);
+		systemeInitialiseModeDissipation(systeme, entier);
+		fscanf(fichier, "%f\n", &reel);
+		systemeInitialiseDissipation(systeme, reel);
+
+		fscanf(fichier, "%f\n", &reel); // Déphasage du premier pendule
+		(*systeme).pendule[0].dephasage = reel;
+
+		fclose(fichier);
+
+		}
+
+	return 0;
+	}
+
+int fichierEcriturePosition(systemeT * systeme, char * nom)
+	{
+	FILE *fichier; /* pointeur sur FILE */
+
+	char chemin[120] = "./donnees/enregistrement/position_";
+
+	char * extension = ".sicf";
+
+	strncat(chemin, nom, 20);
+
+	strncat(chemin, extension, 40);
+
+	fichier = fopen(chemin, "w");
+
+	if(fichier == NULL)
+		{
+		printf("Erreur d'ouverture du fichier d'enregistrement\n");
+		printf("	Vérifier le répertoire donnees/enregistrement\n");
+		}
+	else
+	   	{
+	    double ancien, actuel;
+    	int i;
+
+	    for(i=0;i<(*systeme).nombre;i++)
+	    	{
+	    	//penduleInitialisePosition(&(*systeme).pendule[i], 0.0, 0.0);
+	    	ancien = (*systeme).pendule[i].ancien;
+	    	actuel =(*systeme).pendule[i].nouveau;
+	    	fprintf(fichier, "%f %f\n", ancien, actuel);
+	    	}
+	    fclose(fichier);
+		}
+
+	return 0;
+	}
+
+int fichierLecturePosition(systemeT * systeme, char * nom)
+	{
+	FILE *fichier; /* pointeur sur FILE */
+
+	char chemin[120] = "./donnees/enregistrement/position_";
+
+	char * extension = ".sicf";
+
+	strncat(chemin, nom, 20);
+
+	strncat(chemin, extension, 40);
+
+	fichier = fopen(chemin, "r");
+
+	if(fichier == NULL)
+		{
+		printf("Erreur d'ouverture du fichier d'enregistrement\n");
+		printf("	le fichier donnees/enregistrement/position_%s.sicf est absent\n", nom);
+		}
+	else
+		{
+		float ancien, actuel;
+	    int i;
 		for(i=0;i<(*systeme).nombre;i++)
 			{
 			ancien = 0;
@@ -157,7 +344,7 @@ void fichierLecture(systemeT * systeme, int numero)
 		fclose(fichier);
 		}
 
-	return;
+	return 0;
 	}
 
 void fichierFonction(systemeT * systeme, int numero)

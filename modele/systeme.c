@@ -1,7 +1,7 @@
 /*
-Copyright mars 2019, Stephan Runigo
+Copyright octobre 2020, Stephan Runigo
 runigo@free.fr
-SiCF 2.0  simulateur de corde vibrante et spectre
+SiCF 2.2  simulateur de corde vibrante et spectre
 Ce logiciel est un programme informatique servant à simuler l'équation
 d'une corde vibrante, à calculer sa transformée de fourier, et à donner
 une représentation graphique de ces fonctions.
@@ -47,6 +47,273 @@ void systemeJaugeZero(systemeT * systeme);
 void systemeJauge(systemeT * systeme);
 double systemeMoyenne(systemeT * systeme);
 
+
+/*----------------  INITIALISATION  -------------------*/
+
+
+int systemeInitialiseLibreFixe(systemeT * systeme, int libreFixe)
+	{
+	if(libreFixe>=0 && libreFixe<=4)
+		{
+		(*systeme).libreFixe = libreFixe;
+		printf("(*systeme).libreFixe = %d\n", (*systeme).libreFixe);
+		return 0;
+		}
+	else
+		{
+		(*systeme).libreFixe = 1;
+		printf("ERREUR systemeInitialiseLibreFixe(%d) (*systeme).libreFixe = %d\n", libreFixe, (*systeme).libreFixe);
+		}
+	return 1;
+	}
+
+int systemeInitialiseNombre(systemeT * systeme, int nombre)
+	{
+	if(nombre>=NOMBRE_MIN && nombre<=NOMBRE_MAX)
+		{
+		(*systeme).nombre = nombre;
+		printf("(*systeme).nombre = %d\n", (*systeme).nombre);
+		return 0;
+		}
+	else
+		{
+		(*systeme).nombre = NOMBRE;
+		printf("ERREUR systemeInitialiseNombre(%d) (*systeme).nombre = %d\n", nombre, (*systeme).nombre);
+		}
+	return 1;
+	}
+
+int systemeInitialiseGravitation(systemeT * systeme, float gravitation)
+	{
+	if(gravitation>=GRAVITATION_MIN && gravitation<=GRAVITATION_MAX)
+		{
+		(*systeme).gravitation = gravitation;
+		printf("(*systeme).gravitation = %f\n", (*systeme).gravitation);
+		return 0;
+		}
+	else
+		{
+		(*systeme).gravitation = GRAVITATION;
+		printf("ERREUR systemeInitialiseGravitation(%f) (*systeme).gravitation = %f\n", gravitation, (*systeme).gravitation);
+		}
+	return 1;
+	}
+
+int systemeInitialiseMasseDroite(systemeT * systeme, float masse)
+	{
+	if(masse>=MASSE_MIN && masse<=MASSE_MAX)
+		{
+		(*systeme).masseDroite = masse;
+		printf("(*systeme).masseDroite = %f\n", (*systeme).masseDroite);
+		return 0;
+		}
+	else
+		{
+		(*systeme).masseDroite = MASSE;
+		printf("ERREUR systemeInitialiseMasse(%f) ; ", masse);
+		printf("(*systeme).masseDroite = %f\n", (*systeme).masseDroite);
+		}
+
+	return 1;
+	}
+
+int systemeInitialiseMasseGauche(systemeT * systeme, float masse)
+	{
+	if(masse>=MASSE_MIN && masse<=MASSE_MAX)
+		{
+		(*systeme).masseGauche = masse;
+		printf("(*systeme).masseGauche = %f\n", (*systeme).masseGauche);
+		return 0;
+		}
+	else
+		{
+		(*systeme).masseGauche = MASSE;
+		printf("ERREUR systemeInitialiseMasse(%f) ; ", masse);
+		}
+
+	return 1;
+	}
+
+int systemeInitialiseLongueur(systemeT * systeme, float longueur)
+	{
+	if(longueur>=LONGUEUR_MIN && longueur<=LONGUEUR_MAX)
+		{
+		(*systeme).longueur = longueur;
+		printf("(*systeme).longueur = %f\n", (*systeme).longueur);
+		return 0;
+		}
+	else
+		{
+		(*systeme).longueur = LONGUEUR;
+		printf("ERREUR systemeInitialiseLongueur(%f) (*systeme).longueur = %f\n", longueur, (*systeme).longueur);
+		}
+	return 1;
+	}
+
+int systemeInitialiseDissipation(systemeT * systeme, float dissipation)
+	{
+	if(dissipation>DISSIPATION_MIN && dissipation<DISSIPATION_MAX)
+		{
+		(*systeme).dissipation = dissipation;
+		printf("(*systeme).dissipation = %f\n", (*systeme).dissipation);
+		return 0;
+		}
+	else
+		{
+		(*systeme).dissipation = exp((log(DISSIPATION_MIN)+log(DISSIPATION_MAX))/2);
+		printf("ERREUR systemeInitialiseDissipation(%f) (*systeme).dissipation = %f\n", dissipation, (*systeme).dissipation);
+		}
+	return 1;
+	}
+
+int systemeInitialiseModeDissipation(systemeT * systeme, int modeDissipation)
+	{
+	if(modeDissipation>=0 && modeDissipation<=2)
+		{
+		(*systeme).modeDissipation = modeDissipation;
+		printf("(*systeme).modeDissipation = %d\n", (*systeme).modeDissipation);
+		return 0;
+		}
+	else
+		{
+		(*systeme).modeDissipation = 0;
+		printf("ERREUR systemeInitialiseModeDissipation(%d) (*systeme).modeDissipation = %d\n", modeDissipation, (*systeme).modeDissipation);
+		}
+	return 1;
+	}
+
+int systemeInitialiseCouplage(systemeT * systeme, float couplage)
+	{
+	float couplageReduit = 0;
+	int nombre = (*systeme).nombre;
+
+	if(nombre < NOMBRE_MIN || nombre > NOMBRE_MAX)
+		{
+		nombre = NOMBRE;
+		printf("ERREUR systemeInitialise() (*systeme).nombre = %d\n", (*systeme).nombre);
+		}
+
+	couplageReduit = couplage / nombre;
+
+	if(couplageReduit < COUPLAGE_MAX && couplageReduit > COUPLAGE_MIN)
+		{
+		(*systeme).couplage = couplage;
+		printf("(*systeme).couplage = %f\n", (*systeme).couplage);
+		return 0;
+		}
+	else
+		{
+		(*systeme).couplage = nombre * exp((log(COUPLAGE_MIN)+log(COUPLAGE_MAX))/2);
+		printf("ERREUR systemeInitialiseCouplage(%f) (*systeme).couplage = %f\n", couplage, (*systeme).couplage);
+		}
+	return 1;
+	}
+
+int systemeInitialiseDephasage(systemeT * systeme, float dephasage)
+	{
+	if(dephasage>=-DEPHASAGE_MAX && dephasage<DEPHASAGE_MAX)
+		{
+		(*systeme).dephasage = dephasage;
+		printf("(*systeme).dephasage = %f\n", (*systeme).dephasage);
+		return 0;
+		}
+	else
+		{
+		(*systeme).dephasage = 0;
+		printf("ERREUR systemeInitialise(%f) (*systeme).dephasage = %f\n", dephasage, (*systeme).dephasage);
+		}
+	return 1;
+	}
+
+int systemeInitialiseEquation(systemeT * systeme, int equation)
+	{
+	if(equation>=1 && equation<=4)
+		{
+		(*systeme).equation = equation;
+		printf("(*systeme).equation = %d\n", (*systeme).equation);
+		return 0;
+		}
+	else
+		{
+		(*systeme).equation = 1;
+		printf("ERREUR systemeInitialiseEquation(%d) (*systeme).equation = %d\n", equation, (*systeme).equation);
+		}
+	return 1;
+	}
+
+int systemeInitialise(systemeT * systeme)
+	{
+	// Initialisation des pendules
+	systemeInitialisePendule(systeme);
+
+	// Extrémité absorbante
+	systemeInitialiseLimiteInfini(systeme);
+
+	return 0;
+	}
+
+int systemeInitialisePosition(systemeT * systeme, int forme)
+	{
+	int i;
+
+		switch(forme)	//	
+			{
+			case 0: // Initialise
+				for(i=0;i<(*systeme).nombre;i++)
+					{
+					penduleInitialisePosition(&(*systeme).pendule[i], 0.0, 0.0);
+					};break;
+			case 1: // Initialise
+				for(i=0;i<(*systeme).nombre;i++)
+					{
+					penduleInitialisePosition(&(*systeme).pendule[i], 0.3*sin(i*0.1), 0.301*sin(i*0.1));
+					};break;
+			default:
+				;
+			}
+	return 0;
+	}
+
+void systemeInitialisePendule(systemeT * systeme)
+	{
+	float m=(*systeme).masseGauche;
+	float l=(*systeme).longueur;
+	float d=(*systeme).dissipation;
+	float c=(*systeme).couplage;
+	float g=(*systeme).gravitation;
+	float t=(*systeme).moteurs.dt;
+
+	int i;
+
+	for(i=0;i<(*systeme).nombre;i++)
+		{
+		penduleInitialiseParametre(&(*systeme).pendule[i], m, l, d);
+		penduleInitialiseExterieur(&(*systeme).pendule[i], c, g, t);
+		penduleInitialisePosition(&(*systeme).pendule[i], 0.0, 0.0);
+		penduleInitialiseDephasage(&(*systeme).pendule[i], 0.0);
+		}
+
+	penduleInitialiseDephasage(&(*systeme).pendule[0], (*systeme).dephasage);
+
+	return;
+	}
+
+void systemeInitialiseLimiteInfini(systemeT * systeme)
+	{
+	int i;
+
+	for(i=0;i<(*systeme).nombre;i++)
+		{
+		(*systeme).pendule[i].absorbance = 0.0;
+		}
+
+	for(i=1;i<(*systeme).nombre/6;i++)
+		{
+		(*systeme).pendule[(*systeme).nombre-i].absorbance = 1.0-(float)i/((float)(*systeme).nombre/6.0);
+		}
+
+	return;
+	}
 
 
 /*----------------JAUGE ET NORMALISATION-------------------*/
@@ -115,61 +382,6 @@ double systemeMoyenne(systemeT * systeme)
 	return ( moyenne / (*systeme).nombre );
 	}
 
-int systemeInitialise(systemeT * systeme)
-	{
-	// Initialisation des pendules
-	systemeInitialisePendule(systeme);
-
-	// Initialise les conditions aux limites
-	//systemeChangeLimite(systeme);
-
-	// Extrémité absorbante
-	systemeInitialiseLimiteInfini(systeme);
-/*
-	// Dissipation initiale Corde
-	if((*systeme).equation == 3 || (*systeme).equation == 4)
-		{
-		changeFormeDissipation(systeme, 2);
-		}
-*/
-
-	// Masse initiale Dioptre
-/*
-	if((*systeme).equation == 4)
-		{
-	int i;
-			for(i=(*systeme).nombre/2;i<(*systeme).nombre;i++)
-				{
-				penduleReinitialiseMasse(&(*systeme).pendule[i], (*systeme).masseDroite, (*systeme).moteurs.dt);
-				}
-		}
-	//printf("Systeme initialisé\n");
-*/
-	return 0;
-	}
-
-int systemeInitialisePosition(systemeT * systeme, int forme)
-	{
-	int i;
-
-		switch(forme)	//	
-			{
-			case 0: // Initialise
-				for(i=0;i<(*systeme).nombre;i++)
-					{
-					penduleInitialisePosition(&(*systeme).pendule[i], 0.0, 0.0);
-					};break;
-			case 1: // Initialise
-				for(i=0;i<(*systeme).nombre;i++)
-					{
-					penduleInitialisePosition(&(*systeme).pendule[i], 0.3*sin(i*0.1), 0.301*sin(i*0.1));
-					};break;
-			default:
-				;
-			}
-	return 0;
-	}
-
 /*------------------------  ÉVOLUTION TEMPORELLE  -------------------------*/
 
 int systemeEvolution(systemeT * systeme, int duree)
@@ -213,47 +425,6 @@ int systemeEvolution(systemeT * systeme, int duree)
 	return 0;
 	}
 */
-void systemeInitialisePendule(systemeT * systeme)
-	{
-	float m=(*systeme).masseGauche;
-	float l=(*systeme).longueur;
-	float d=(*systeme).dissipation;
-	float c=(*systeme).couplage;
-	float g=(*systeme).gravitation;
-	float t=(*systeme).moteurs.dt;
-
-	int i;
-
-	for(i=0;i<(*systeme).nombre;i++)
-		{
-		penduleInitialiseParametre(&(*systeme).pendule[i], m, l, d);
-		penduleInitialiseExterieur(&(*systeme).pendule[i], c, g, t);
-		penduleInitialisePosition(&(*systeme).pendule[i], 0.0, 0.0);
-		penduleInitialiseDephasage(&(*systeme).pendule[i], 0.0);
-		}
-
-	penduleInitialiseDephasage(&(*systeme).pendule[0], (*systeme).dephasage);
-
-	return;
-	}
-
-void systemeInitialiseLimiteInfini(systemeT * systeme)
-	{
-	int i;
-
-	for(i=0;i<(*systeme).nombre;i++)
-		{
-		(*systeme).pendule[i].absorbance = 0.0;
-		}
-
-	for(i=1;i<(*systeme).nombre/6;i++)
-		{
-		(*systeme).pendule[(*systeme).nombre-i].absorbance = 1.0-(float)i/((float)(*systeme).nombre/6.0);
-		}
-
-
-	return;
-	}
 
 void systemeCouplage(systemeT * systeme)
 	{//	Calcul des forces de couplage
@@ -291,7 +462,7 @@ void systemeInertie(systemeT * systeme)
 	int equation = (*systeme).equation;
 	int libreFixe = (*systeme).libreFixe;
 	int etatMoteur = (*systeme).moteurs.generateur;
-	float courantJosephson = (*systeme).moteurs.josephson;
+	float courantJosephson = (*systeme).moteurs.courantJosephson * (*systeme).moteurs.dt * (*systeme).moteurs.dt * (*systeme).moteurs.etatJosephson;
 
 	float moteurs = moteursGenerateur(&(*systeme).moteurs);
 

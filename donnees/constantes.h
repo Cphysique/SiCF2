@@ -1,7 +1,7 @@
 /*
-Copyright avril 2019, Stephan Runigo
+Copyright octobre 2020, Stephan Runigo
 runigo@free.fr
-SiCF 2.0  simulateur de corde vibrante et spectre
+SiCF 2.2  simulateur de corde vibrante et spectre
 Ce logiciel est un programme informatique servant à simuler l'équation
 d'une corde vibrante, à calculer sa transformée de fourier, et à donner
 une représentation graphique de ces fonctions.
@@ -104,11 +104,17 @@ termes.
 #define COUPLAGE_MAX 99 // Couplage maximal / nombre de pendule
 #define COUPLAGE_MIN 0.099
 
-#define GRAVITATION_MAX 77 // Gravitation maximale.
-#define GRAVITATION_MIN 0.07 // Gravitation minimale.
+#define GRAVITATION_MAX 77.7	// Gravitation maximale
+#define GRAVITATION 9.81		// Gravitation implicite
+#define GRAVITATION_MIN 0.07	// Gravitation minimale
 
-#define MASSE_MAX 55
-#define MASSE_MIN 0.7
+#define MASSE_MAX 77.7	//	Masse maximale
+#define MASSE 1.0		//	Masse implicite
+#define MASSE_MIN 0.7	//	Masse minimale
+
+#define LONGUEUR_MAX 1.0	//	Longueur maximale
+#define LONGUEUR 1.0		//	Longueur implicite
+#define LONGUEUR_MIN 1.0	//	Longueur minimale
 
 #define DISSIPATION_MAX 333	//	Coeficient de frottement visqueux maximal
 #define DISSIPATION_MIN 0.033	//	Valeur minimale

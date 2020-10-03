@@ -1,7 +1,7 @@
 /*
-Copyright mars 2019, Stephan Runigo
+Copyright octobre 2020, Stephan Runigo
 runigo@free.fr
-SiCF 2.0  simulateur de corde vibrante et spectre
+SiCF 2.2  simulateur de corde vibrante et spectre
 Ce logiciel est un programme informatique servant à simuler l'équation
 d'une corde vibrante, à calculer sa transformée de fourier, et à donner
 une représentation graphique de ces fonctions.
@@ -63,6 +63,23 @@ typedef struct SystemeT systemeT;
 		float gravitation;	//	Valeur de la gravitation
 
 		};
+
+	//	Initialisation des paramètres
+int systemeInitialiseNombre(systemeT * systeme, int nombre);
+int systemeInitialiseEquation(systemeT * systeme, int equation);
+
+int systemeInitialiseDephasage(systemeT * systeme, float dephasage);
+int systemeInitialiseLibreFixe(systemeT * systeme, int libreFixe);
+
+int systemeInitialiseMasseDroite(systemeT * systeme, float masse);
+int systemeInitialiseMasseGauche(systemeT * systeme, float masse);
+int systemeInitialiseLongueur(systemeT * systeme, float longueur);
+
+int systemeInitialiseCouplage(systemeT * systeme, float couplage);
+int systemeInitialiseDissipation(systemeT * systeme, float dissipation);
+int systemeInitialiseModeDissipation(systemeT * systeme, int modeDissipation);
+
+int systemeInitialiseGravitation(systemeT * systeme, float gravitation);
 
 int systemeInitialise(systemeT * systeme);
 

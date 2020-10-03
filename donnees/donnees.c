@@ -1,7 +1,7 @@
 /*
-Copyright mars 2019, Stephan Runigo
+Copyright octobre 2020, Stephan Runigo
 runigo@free.fr
-SiCF 2.0  simulateur de corde vibrante et spectre
+SiCF 2.2  simulateur de corde vibrante et spectre
 Ce logiciel est un programme informatique servant à simuler l'équation
 d'une corde vibrante, à calculer sa transformée de fourier, et à donner
 une représentation graphique de ces fonctions.
@@ -80,8 +80,8 @@ int donneesControleur(controleurT * controleur)
 	int x, y;
 	SDL_GetWindowSize((*controleur).interface.fenetre, &largeur, &hauteur);
 
-	(*controleur).graphique.largeur=largeur;
-	(*controleur).graphique.hauteur=hauteur;
+	(*controleur).graphique.fenetreX=largeur;
+	(*controleur).graphique.fenetreY=hauteur;
 
 	commandesInitialiseBoutons(&(*controleur).commandes, largeur, hauteur);
 	capteursMiseAJourLongueur(&(*controleur).capteurs, largeur, hauteur);
@@ -116,7 +116,7 @@ int donneesOptions(optionsT * options)
 	(*options).soliton=0;
 	(*options).support=-1;		// Support de la chaîne
 	(*options).nombre=NOMBRE;		// Nombre implicite de pendule
-	(*options).equation=1;		// 1 : pendule, 2 : linéarisation,
+	(*options).equation=3;		// 1 : pendule, 2 : linéarisation,
 							//	 3 : corde, 4 : dioptre
 
 	return 0;
@@ -131,12 +131,15 @@ int donneesSysteme(systemeT * systeme, optionsT * options)
 
 	(*systeme).moteurs.chrono = 0.0;
 
+	(*systeme).moteurs.etatJosephson = 0;			//	-1, 0, 1
+	(*systeme).moteurs.courantJosephson = sqrt(JOSEPHSON_MAX*JOSEPHSON_MIN);
+/*
 	(*systeme).moteurs.courant=3.0;		// Mémoire courant Josephson si = 0
 	(*systeme).moteurs.josephson=0;//-3*(*options).dt*(*options).dt;
-
-	(*systeme).moteurs.generateur = 0;	// éteint, sinus, carre, impulsion
-	(*systeme).moteurs.amplitude=0.3;		// Amplitude du générateur de signaux
-	(*systeme).moteurs.frequence=1.0;	// Fréquence du générateur de signaux
+*/
+	(*systeme).moteurs.generateur = 1;	// éteint, sinus, carre, impulsion
+	(*systeme).moteurs.amplitude=sqrt(AMPLITUDE_MAX * AMPLITUDE_MIN);		// Amplitude du générateur de signaux
+	(*systeme).moteurs.frequence=sqrt(FREQUENCE_MAX * FREQUENCE_MIN);	// Fréquence du générateur de signaux
 	(*systeme).moteurs.phi=0;
 
 		// Caractéristique de la chaîne
@@ -148,20 +151,20 @@ int donneesSysteme(systemeT * systeme, optionsT * options)
 
 		// Paramètres physiques
 
-	//(*systeme).gravitation = 9.81; // 4*PI*PI
-	(*systeme).gravitation = 0.0; // 4*PI*PI
+	(*systeme).gravitation = 9.81; // 4*PI*PI
+	//(*systeme).gravitation = 0.0; // 4*PI*PI
 	(*systeme).masseDroite = 1.0;
 	(*systeme).masseGauche = 1.0;
 	(*systeme).longueur = 1.0;// 9.81/4/PI/PI = 25 cm => période = 1 s. Met en évidence une erreur dans le calcul de l'énergie de couplage.
-	(*systeme).dissipation = 0.17;
-	(*systeme).modeDissipation = 0;	//	0 : nulle 1 : uniforme, 2 : extrémité absorbante.
-	(*systeme).couplage = 11.1 * (*systeme).nombre;
+	(*systeme).dissipation = sqrt(DISSIPATION_MAX * DISSIPATION_MIN * 3);
+	(*systeme).modeDissipation = 2;	//	0 : nulle 1 : uniforme, 2 : extrémité absorbante.
+	(*systeme).couplage = sqrt(COUPLAGE_MAX * COUPLAGE_MIN) * (*systeme).nombre;
 	(*systeme).dephasage = (*options).soliton * 2 * PI;
 
 		//fprintf(stderr, " Initialisation du système\n");
 	systemeInitialise(systeme);
 	changeFormeDissipation(systeme, 1);
-	changeFormeDissipation(systeme, 0);
+	changeFormeDissipation(systeme, 2);
 	changeConditionsLimites(systeme, (*systeme).libreFixe);
 	systemeInitialisePosition(systeme, 0);
 

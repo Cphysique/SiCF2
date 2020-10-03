@@ -1,7 +1,7 @@
 /*
-Copyright mars 2019, Stephan Runigo
+Copyright octobre 2020, Stephan Runigo
 runigo@free.fr
-SiCF 2.0  simulateur de corde vibrante et spectre
+SiCF 2.2  simulateur de corde vibrante et spectre
 Ce logiciel est un programme informatique servant à simuler l'équation
 d'une corde vibrante, à calculer sa transformée de fourier, et à donner
 une représentation graphique de ces fonctions.
@@ -66,8 +66,8 @@ struct GraphiqueT {
 
 	SDL_Texture *mobile;
 
-	int largeur;
-	int hauteur;
+	int fenetreX;
+	int fenetreY;
 
 };
 typedef struct GraphiqueT graphiqueT;
