@@ -139,4 +139,7 @@ y vient de t qui vient de k
 i vient de u qui vient de m
 p vient de o qui vient de d ou f ou s ou q
 
+SiCF.2.2.1
+shasum -a 256 SiCF2.exe 
+83ea88e621fcb6d81320ddfa7df1a1f5b911955e8b07dca2e27bc108d562cfa9  SiCF2.exe
 
